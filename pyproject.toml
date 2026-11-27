@@ -1,0 +1,69 @@
+[project]
+name = "docmore-paddleocr-vl-16"
+version = "0.1.0"
+description = "PaddleOCR-VL 1.6 文档转换：PDF/图片 -> Markdown/HTML/Docling，PP-DocLayoutV3 ONNX 版面检测 + PaddleOCR-VL 1.6 逐区域识别，复用 docmore-utility"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "mps.wen", email = "mps.wen@163.com" }]
+requires-python = ">=3.10"
+dependencies = [
+    "click>=8.1",
+    "pillow>=10.0",
+    "numpy>=1.26",
+    "beautifulsoup4>=4.12",
+    "openai>=1.30",
+    "pydantic-settings>=2.2",
+    "python-dotenv>=1.0",
+    "docmore-utility>=0.2.0",
+]
+
+[project.optional-dependencies]
+# ONNX 版面检测后端（PP-DocLayoutV3）
+layout = [
+    "onnxruntime>=1.18",
+    "opencv-python-headless>=4.10",
+    "shapely>=2.0",
+]
+# GPU 版面检测后端（二选一，与 layout 互斥）
+layout-gpu = [
+    "onnxruntime-gpu>=1.18",
+    "opencv-python-headless>=4.10",
+    "shapely>=2.0",
+]
+# 基于内容的文件类型识别（否则按扩展名回退）
+detect = ["docmore-utility[magika]>=0.2.0"]
+# DoclingDocument 导出
+docling = ["docling-core>=2.30"]
+# OpenAI 兼容 HTTP 服务（/v1/parse + /v1/chat/completions）
+server = [
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.30",
+    "httpx>=0.27",
+]
+
+[project.scripts]
+docmore-paddleocr-vl-16 = "docmore.paddleocr_vl_16.cli:main"
+paddleocr-vl-16 = "docmore.paddleocr_vl_16.cli:main"
+docmore-paddleocr-vl-16-serve = "docmore.paddleocr_vl_16.server.cli:serve"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "httpx>=0.27",
+]
+
+[[tool.uv.index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# 注意：必须是 src/docmore（namespace 根），写成 src/docmore/<name> 会被
+# hatchling 拍平而丢失 docmore. 前缀（实测踩坑）。
+[tool.hatch.build.targets.wheel]
+packages = ["src/docmore"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/docmore"]

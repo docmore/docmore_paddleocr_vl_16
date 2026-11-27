@@ -1,0 +1,11 @@
+# 构建/运行无关内容不进构建上下文
+__pycache__/
+*.pyc
+*.egg-info/
+.venv*/
+.benchmarks/
+tests/
+docs/
+local.env
+dist/
+.pytest_cache/
